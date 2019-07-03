@@ -1,6 +1,6 @@
 
 function addPosters(app, database, passport) {
-    app.post('/Bookish/AddPublisher', passport.authenticate('jwt', { session: false }), (req, res) => {
+    app.post('/Bookish/publishers', passport.authenticate('jwt', { session: false }), (req, res) => {
         console.log(req.body);
         if (!req.body.name) {
             res.send("Publisher name not found");
@@ -18,7 +18,7 @@ function addPosters(app, database, passport) {
         res.send("successful");
     })
 
-    app.post('/Bookish/AddUser', passport.authenticate('jwt', { session: false }), (req, res) => {
+    app.post('/Bookish/users', passport.authenticate('jwt', { session: false }), (req, res) => {
         console.log(req.body);
         if (!req.body.name) {
             res.send("User name not found");
@@ -38,7 +38,7 @@ function addPosters(app, database, passport) {
         res.send("successful");
     })
 
-    app.post('/Bookish/AddBookTemp', passport.authenticate('jwt', { session: false }), (req, res) => {
+    app.post('/Bookish/book_temps', passport.authenticate('jwt', { session: false }), (req, res) => {
         console.log(req.body);
 
         // Input should have .author .isbn .title .publisher
@@ -75,7 +75,7 @@ function addPosters(app, database, passport) {
         res.send("successful");
     })
 
-    app.post('/Bookish/AddBook', passport.authenticate('jwt', { session: false }), (req, res) => {
+    app.post('/Bookish/books', passport.authenticate('jwt', { session: false }), (req, res) => {
         console.log(req.body.count);
 
         database.sequelize.sync();
@@ -101,7 +101,7 @@ function addPosters(app, database, passport) {
         res.send("successful");
     })
 
-    app.post('/Bookish/AddAuthor', passport.authenticate('jwt', { session: false }), (req, res) => {
+    app.post('/Bookish/authors', passport.authenticate('jwt', { session: false }), (req, res) => {
         console.log(req.body);
         if (!req.body.name) {
             res.send("Author name not found");

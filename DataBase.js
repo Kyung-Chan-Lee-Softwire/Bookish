@@ -13,7 +13,6 @@ class DataBase {
             name: Sequelize.STRING
         });
 
-
         this.publishers = this.sequelize.define('publishers', {
             name: Sequelize.STRING
         });

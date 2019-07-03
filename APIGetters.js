@@ -1,10 +1,15 @@
 
 function addGetters(app, database, passport) {
-    app.get('/Bookish/authors', passport.authenticate('jwt', { session: false }), (req, res) => {
 
-        database.sequelize.sync();
-        database.authors.findAll().then((authorData) => res.send(authorData));
-    });
+    for (let table of [database.authors, database.users, database.books, database.book_temps, database.publishers]) {
+
+        app.get(`/Bookish/${table.getTableName()}`, passport.authenticate('jwt', { session: false }), (req, res) => {
+
+            database.sequelize.sync();
+
+            table.findAll({ where: req.query }).then((data) => res.send(data));
+        });
+    }
 }
 
 module.exports.addGetters = addGetters; 

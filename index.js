@@ -22,9 +22,9 @@ app.use(bodyParser.json());
 app.use(cors());
 
 function extractJwtCookie(req) {
-  if (!req.headers.cookie) return;
-  let cookies = req.headers.cookie.split('=');
-  return cookies[1];
+    if (!req.headers.cookie) return;
+    let cookies = req.headers.cookie.split('=');
+    return cookies[1];
 }
 
 let opts = {}
@@ -32,48 +32,48 @@ opts.jwtFromRequest = extractJwtCookie;
 opts.secretOrKey = 'secret';
 
 passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
-  database.sequelize.sync();
-  database.users.findOne({ where: { loginName: jwt_payload.id } }).then((user, err) => {
+    database.sequelize.sync();
+    database.users.findOne({ where: { loginName: jwt_payload.id } }).then((user, err) => {
 
-    if (err) {
-      return done(err, false);
-    }
+        if (err) {
+            return done(err, false);
+        }
 
-    if (user) {
-      return done(null, user);
-    } else {
-      return done(null, false);
-    }
-  });
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
+        }
+    });
 }));
 
 app.get('/login', (req, res) => {
-  database.sequelize.sync();
-  let id = req.query.id;
-  let password = req.query.password;
+    database.sequelize.sync();
+    let id = req.query.id;
+    let password = req.query.password;
 
-  if (id == undefined || password == undefined) {
-      console.log("Missing password or id");
-      return;
-  }
+    if (id == undefined || password == undefined) {
+        console.log("Missing password or id");
+        return;
+    }
 
-  database.users.findOne({ where: { loginName: id } }).then((userData) => {
+    database.users.findOne({ where: { loginName: id } }).then((userData) => {
 
-      if (userData == undefined) {
-          console.log('No user with that name found');
-      } else if (password != userData.loginPW) {
-          console.log('invalid pw');
-      } else {
+        if (userData == undefined) {
+            console.log('No user with that name found');
+        } else if (password != userData.loginPW) {
+            console.log('invalid pw');
+        } else {
 
-          var payload = { 'id': userData.loginName };
-          var token = jwt.sign(payload, opts.secretOrKey);
+            var payload = { 'id': userData.loginName };
+            var token = jwt.sign(payload, opts.secretOrKey);
 
-          res.setHeader("Authorization", `Bearer ${token}`);
-          res.cookie("jwt", token);
-          res.json({ message: "ok", token: token });
+            res.setHeader("Authorization", `Bearer ${token}`);
+            res.cookie("jwt", token);
+            res.json({ message: "ok", token: token });
 
-      }
-  })
+        }
+    })
 })
 
 require('./APIGetters').addGetters(app, database, passport);
