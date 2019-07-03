@@ -41,16 +41,17 @@ book_temps.belongsTo(publishers);
 book_temps.belongsTo(authors);
 
 
-var book = sequelize.define('book', {
+var books = sequelize.define('books', {
+  dueDate: Sequelize.STRING
 });
 
-book.belongsTo(book_temps);
-book.belongsTo(users);
+books.belongsTo(book_temps);
+books.belongsTo(users);
 
 // users.create({
-//   name: 'Whatever',
-//   loginName: 'Whatever2',
-//   loginPW: 'Whatever3'
+//   name: 'Lukas Zierahn',
+//   loginName: 'Lukas',
+//   loginPW: 'Zierahn'
 // })
 
 sequelize.sync();
@@ -61,7 +62,6 @@ const cors = require('cors');
 const port = 3000;
 
 const JwtStrategy = require('passport-jwt').Strategy;
-const { ExtractJwt } = require('passport-jwt');
 const jwt = require('jsonwebtoken');
 var bodyParser = require("body-parser");
 
@@ -69,7 +69,6 @@ var bodyParser = require("body-parser");
 app.use(express.static('frontend'));
 app.use(passport.initialize());
 app.use(bodyParser.json());
-//app.use(express.cookieParser());
 
 
 app.use(cors());
@@ -78,7 +77,6 @@ function extractJwtCookie(req) {
   if (!req.headers.cookie) return;
   let cookies = req.headers.cookie.split('=');
   return cookies[1];
-  // return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IldoYXRldmVyMiIsImlhdCI6MTU2MjE1OTkxNiwiZXhwIjoxODIxMzU5OTE2fQ.Dzp6QKg0n1uQ5vmsKJERRxYcXhxGSiGVbeIuutOfWpI";
 }
 
 let opts = {}
@@ -139,3 +137,121 @@ app.get('/Bookish/AllBooks', passport.authenticate('jwt', { session: false }), (
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
+app.post('/Bookish/AddAuthor', passport.authenticate('jwt', { session: false }), (req, res) => {
+  console.log(req.body);
+  if (!req.body.name) {
+    res.send("Author name not found");
+    return;
+  }
+
+  sequelize.sync();
+
+  authors.create({
+    name: req.body.name
+  });
+
+  sequelize.sync();
+
+  res.send("successful");
+})
+
+app.post('/Bookish/AddPublisher', passport.authenticate('jwt', { session: false }), (req, res) => {
+  console.log(req.body);
+  if (!req.body.name) {
+    res.send("Publisher name not found");
+    return;
+  }
+
+  sequelize.sync();
+
+  publishers.create({
+    name: req.body.name
+  });
+
+  sequelize.sync();
+
+  res.send("successful");
+})
+
+app.post('/Bookish/AddUser', passport.authenticate('jwt', { session: false }), (req, res) => {
+  console.log(req.body);
+  if (!req.body.name) {
+    res.send("User name not found");
+    return;
+  }
+
+  sequelize.sync();
+
+  users.create({
+    name: req.body.name,
+    loginName: req.body.loginName,
+    loginPW: req.body.loginPW
+  });
+
+  sequelize.sync();
+
+  res.send("successful");
+})
+
+app.post('/Bookish/AddBookTemp', passport.authenticate('jwt', { session: false }), (req, res) => {
+  console.log(req.body);
+
+  // Input should have .author .isbn .title .publisher
+
+  sequelize.sync();
+
+  // ISBN Title Publisher Authors
+
+  Promise.all([authors.findOne({ where: { name: req.body.author } }), publishers.findOne({ where: { name: req.body.publisher } })])
+    .then((authorPublisherData) => {
+      if (authorPublisherData[0] == undefined) {
+        console.log('No author with that name found');
+        res.send("author name not found");
+      } else if (authorPublisherData[1] == undefined) {
+
+        console.log('No Publisher with that name found');
+        res.send("Publisher name not found");
+      }
+      else {
+        console.log(authorPublisherData[1].id);
+        book_temps.create({
+          ISBN: req.body.ISBN,
+          title: req.body.title,
+          authorId: authorPublisherData[0].id,
+          publisherId: authorPublisherData[1].id,
+        })
+      }
+    });
+
+  //TODO: Error check
+
+  sequelize.sync();
+
+  res.send("successful");
+})
+
+app.post('/Bookish/AddBook', passport.authenticate('jwt', { session: false }), (req, res) => {
+  console.log(req.body.count);
+
+  sequelize.sync();
+
+  books.create({
+    bookTempISBN: req.body.ISBN,
+    dueDate: null,
+    userLoginName: null
+  });
+
+  if (req.body.count) {
+    for (i = 1; i < req.body.count; i++) {
+      books.create({
+        bookTempISBN: req.body.ISBN,
+        dueDate: null,
+        userLoginName: null
+      });
+    }
+  }
+
+  sequelize.sync();
+
+  res.send("successful");
+})
