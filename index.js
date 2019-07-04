@@ -78,5 +78,7 @@ app.get('/login', (req, res) => {
 
 require('./APIGetters').addGetters(app, database, passport);
 require('./APIPosters').addPosters(app, database, passport);
+require('./APIBorrowReturn').addBorrow(app, database, passport);
+require('./APIBorrowReturn').addReturn(app, database, passport);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

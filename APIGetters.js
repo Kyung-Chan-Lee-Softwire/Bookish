@@ -7,7 +7,20 @@ function addGetters(app, database, passport) {
 
             database.sequelize.sync();
 
-            table.findAll({ where: req.query }).then((data) => res.send(data));
+            table.findAll({ where: req.query }).then((data) => res.send(data.sort((a, b) => {
+                switch (table.getTableName()) {
+                    case 'authors':
+                        return a.name > b.name;
+                    case 'publishers':
+                        return a.name > b.name;
+                    case 'users':
+                        return a.name > b.name;
+                    case 'book_temps':
+                        return a.title > b.title;
+                    case 'books':
+                        return a.id > b.id;
+                }
+            })));
         });
     }
 }

@@ -58,7 +58,7 @@ function addPosters(app, database, passport) {
                     res.send("Publisher name not found");
                 }
                 else {
-                    console.log(authorPublisherData[1].id);
+                    // console.log(authorPublisherData[1].id);
                     database.book_temps.create({
                         ISBN: req.body.ISBN,
                         title: req.body.title,
