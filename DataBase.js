@@ -55,6 +55,10 @@ class DataBase {
         //   loginPW: 'Zierahn'
         // })
 
+        this.publishers.create({
+          name: 'Lukas Zierahn'
+        })
+
         this.sequelize.sync();
     }
 }
