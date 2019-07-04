@@ -41,7 +41,16 @@ function addPosters(app, database, passport) {
     app.post('/Bookish/book_temps', passport.authenticate('jwt', { session: false }), (req, res) => {
         console.log(req.body);
 
-        // Input should have .author .isbn .title .publisher
+        if (!req.body.ISBN) {
+            res.send("ISBN not found");
+            return;
+        }
+
+        if (!req.body.Title) {
+            res.send("Title not found");
+            return;
+        }
+
 
         database.sequelize.sync();
 
